@@ -1,0 +1,15 @@
+# Frontend Environment Variables
+
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://rtmodogkaytprhunsmda.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0bW9kb2drYXl0cHJodW5zbWRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3NDM2ODMsImV4cCI6MjA4NjMxOTY4M30.uwojGpEUy4MY_Xo4AgrFmrUcyOj_fW58ZcNnqOHtEcE
+
+# App Configuration
+NEXT_PUBLIC_APP_NAME=School Management System
+NEXT_PUBLIC_APP_LOGO=https://example.com/logo.png
+
+
+

@@ -1,0 +1,219 @@
+# Docker Compose for Multi-Tenant Production Infrastructure
+# Includes: Nginx, PostgreSQL, Redis, Backend, Frontend
+
+version: "3.8"
+
+services:
+  # ==================== DATABASE ====================
+  postgres:
+    image: postgres:15-alpine
+    container_name: schools_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=en_US.UTF-8"
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/migrations:/docker-entrypoint-initdb.d/02-migrations
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - schools-network
+    restart: unless-stopped
+
+  # ==================== CACHE ====================
+  redis:
+    image: redis:7-alpine
+    container_name: schools_redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - schools-network
+    restart: unless-stopped
+
+  # ==================== BACKEND API ====================
+  backend-1:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: schools_backend_1
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      FRONTEND_URL: https://ventionz.com
+      DEVELOPMENT_MODE_TENANT: demo
+    ports:
+      - "5001:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - schools-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend-2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: schools_backend_2
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      FRONTEND_URL: https://ventionz.com
+    ports:
+      - "5002:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - schools-network
+    restart: unless-stopped
+
+  backend-3:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: schools_backend_3
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      FRONTEND_URL: https://ventionz.com
+    ports:
+      - "5003:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - schools-network
+    restart: unless-stopped
+
+  # ==================== FRONTEND ====================
+  frontend-1:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: schools_frontend_1
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: https://ventionz.com/api
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend-1
+    networks:
+      - schools-network
+    restart: unless-stopped
+
+  frontend-2:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: schools_frontend_2
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: https://ventionz.com/api
+    ports:
+      - "3002:3000"
+    depends_on:
+      - backend-1
+    networks:
+      - schools-network
+    restart: unless-stopped
+
+  # ==================== NGINX ====================
+  nginx:
+    image: nginx:latest
+    container_name: schools_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - ./infrastructure/nginx/multi-tenant.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/certbot/conf:/etc/letsencrypt:ro
+      - ./infrastructure/certbot/www:/var/www/certbot:ro
+      - nginx_cache:/var/cache/nginx
+      - /var/log/nginx:/var/log/nginx
+    depends_on:
+      - backend-1
+      - backend-2
+      - backend-3
+      - frontend-1
+      - frontend-2
+    networks:
+      - schools-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/nginx_status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ==================== CERTBOT (SSL) ====================
+  certbot:
+    image: certbot/certbot:latest
+    container_name: schools_certbot
+    volumes:
+      - ./infrastructure/certbot/conf:/etc/letsencrypt
+      - ./infrastructure/certbot/www:/var/www/certbot
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h & wait $${!}; done;"
+    depends_on:
+      - nginx
+    networks:
+      - schools-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  nginx_cache:
+
+networks:
+  schools-network:
+    driver: bridge
