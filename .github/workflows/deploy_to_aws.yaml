@@ -11,32 +11,35 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install all dependencies
+      - name: Install dependencies
         run: npm run install-all
 
-      #  - name: Build client
+      # Optional build step
+      # - name: Build client
       #   run: npm run build
 
       - name: Deploy to AWS
-        uses: easingthemes/ssh-deploy@v5.0.3
+        uses: easingthemes/ssh-deploy@v5
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SOURCE: "."
           REMOTE_HOST: ec2-52-71-253-131.compute-1.amazonaws.com
-          REMOTE_USER: "ubuntu"
+          REMOTE_USER: ubuntu
           TARGET: "/var/www/cps/"
 
       - name: Restart server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
           host: ec2-52-71-253-131.compute-1.amazonaws.com
-          username: "ubuntu"
-          script: "cd /var/www/cps/backend && npm run restart"
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/cps/backend
+            npm run restart
