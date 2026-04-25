@@ -100,31 +100,6 @@ export interface Attendance {
   markedBy?: string;
 }
 
-// Exam types
-export interface Exam {
-  id: string;
-  academicYearId: string;
-  examName: string;
-  examCode: string;
-  examType: "midterm" | "final" | "quiz" | "practical" | "other";
-  startDate: Date;
-  endDate: Date;
-  totalMarks: number;
-  passingMarks: number;
-}
-
-// Marks types
-export interface Mark {
-  id: string;
-  studentId: string;
-  examId: string;
-  subjectId: string;
-  obtainedMarks: number;
-  totalMarks: number;
-  grade?: string;
-  remarks?: string;
-}
-
 // Fee types
 export interface Invoice {
   id: string;

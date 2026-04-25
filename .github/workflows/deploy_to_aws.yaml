@@ -32,3 +32,11 @@ jobs:
           REMOTE_HOST: ec2-52-71-253-131.compute-1.amazonaws.com
           REMOTE_USER: "ubuntu"
           TARGET: "/var/www/cps/"
+
+      - name: Restart server
+        uses: appleboy/ssh-action@master
+        with:
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ec2-52-71-253-131.compute-1.amazonaws.com
+          username: "ubuntu"
+          script: "cd /var/www/cps/backend && npm run restart"

@@ -508,6 +508,7 @@ export const getClassResultSheet = asyncHandler(
         overallGrade,
         overallGPA,
         passed,
+        rank: 0,
       });
     }
 

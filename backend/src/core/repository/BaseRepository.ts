@@ -1,4 +1,5 @@
-import { query, QueryResult } from "../../config/database.js";
+import type { QueryResult } from "pg";
+import { query } from "../../config/database.js";
 
 export interface BaseEntity {
   id: string;

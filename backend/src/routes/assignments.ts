@@ -20,20 +20,20 @@ router.use(authenticateToken);
 
 router.get("/meta", getAssignmentMeta);
 router.get("/", listAssignments);
-router.post("/", authorizeRole("admin", "teacher"), createAssignment);
+router.post("/", authorizeRole(["admin", "teacher"]), createAssignment);
 router.put(
   "/:assignmentId",
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   updateAssignment,
 );
 router.patch(
   "/:assignmentId/status",
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   updateAssignmentStatus,
 );
 router.delete(
   "/:assignmentId",
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   deleteAssignment,
 );
 router.get("/student/dashboard", getStudentAssignmentDashboard);
@@ -45,12 +45,12 @@ router.post(
 );
 router.get(
   "/:assignmentId/grading",
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   getAssignmentGradingPanel,
 );
 router.put(
   "/submissions/:submissionId/grade",
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   gradeAssignmentSubmission,
 );
 

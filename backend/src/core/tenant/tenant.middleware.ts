@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { query } from "../config/database.js";
-import { sendError } from "../utils/response.js";
+import { query } from "../../config/database.js";
+import { sendError } from "../../utils/response.js";
 
 export interface TenantInfo {
   id: string;

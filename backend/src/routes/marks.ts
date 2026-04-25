@@ -54,7 +54,7 @@ const router = express.Router();
 router.post(
   "/bulk",
   authenticateToken,
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   uploadMarksBulk,
 );
 
@@ -94,7 +94,7 @@ router.post(
 router.put(
   "/:id",
   authenticateToken,
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   updateStudentMarks,
 );
 
@@ -173,7 +173,7 @@ router.get("/student/:studentId", authenticateToken, getStudentAllResults);
 router.get(
   "/class/:classId/exam/:examId",
   authenticateToken,
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   getClassResultSheet,
 );
 

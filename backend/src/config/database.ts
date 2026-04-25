@@ -87,7 +87,7 @@ const ssl = isSslEnabled(connectionString)
   ? { rejectUnauthorized: !allowSelfSigned }
   : false;
 
-const pool = new Pool({
+export const pool = new Pool({
   ...(connectionString
     ? {
         connectionString,

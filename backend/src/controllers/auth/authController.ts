@@ -132,8 +132,8 @@ export const signup = asyncHandler(async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("\n=== SIGNUP ERROR ===");
-    console.error("Error type:", error.constructor.name);
-    console.error("Error message:", error.message);
+    console.error("Error type:", (error as Error).constructor.name);
+    console.error("Error message:", (error as Error).message);
     console.error("Error code:", (error as any).code);
     console.error("Full error:", error);
     console.error("=== END ERROR ===\n");

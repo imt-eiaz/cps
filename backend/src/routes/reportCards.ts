@@ -15,12 +15,12 @@ router.use(authenticateToken);
 router.get("/meta", getReportCardMeta);
 router.post(
   "/generate",
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   generateReportCards,
 );
 router.get(
   "/tabulation",
-  authorizeRole("admin", "teacher"),
+  authorizeRole(["admin", "teacher"]),
   getTabulationSheet,
 );
 router.get("/student/me", authorizeRole("student"), getMyReportCard);

@@ -653,7 +653,7 @@ export const submitAssignment = asyncHandler(
     const isLate = new Date() > dueDate;
     const submissionStatus = isLate ? "late" : "submitted";
 
-    if (existingSubmissionResult.rowCount > 0) {
+    if ((existingSubmissionResult.rowCount ?? 0) > 0) {
       if (!assignment.allow_resubmission) {
         return sendError(
           res,

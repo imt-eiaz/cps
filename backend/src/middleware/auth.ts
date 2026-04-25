@@ -58,7 +58,8 @@ export const authenticateToken = (
   );
 };
 
-export const authorizeRole = (...roles: string[]) => {
+export const authorizeRole = (roles: string | string[]) => {
+  const allowed = Array.isArray(roles) ? roles : [roles];
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({
@@ -68,10 +69,10 @@ export const authorizeRole = (...roles: string[]) => {
       });
     }
 
-    if (!roles.includes(req.user.roleName)) {
+    if (!allowed.includes(req.user.roleName)) {
       return res.status(403).json({
         success: false,
-        message: `Access denied. Required roles: ${roles.join(", ")}`,
+        message: `Access denied. Required roles: ${allowed.join(", ")}`,
         statusCode: 403,
       });
     }
