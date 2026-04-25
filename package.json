@@ -1,4 +1,9 @@
 {
+  "private": true,
+  "scripts": {
+    "install-all": "npm --prefix backend ci && npm --prefix frontend ci",
+    "build": "npm --prefix frontend run build && npm --prefix backend run build"
+  },
   "devDependencies": {
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.14"
