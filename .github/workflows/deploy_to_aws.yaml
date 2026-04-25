@@ -41,12 +41,12 @@ jobs:
             dist
             build
 
-      - name: Restart server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ec2-52-71-253-131.compute-1.amazonaws.com
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/cps/backend
-            npm run restart
+      # - name: Restart server
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ec2-52-71-253-131.compute-1.amazonaws.com
+      #     username: ubuntu
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     script: |
+      #       cd /var/www/cps/backend
+      #       npm run restart
