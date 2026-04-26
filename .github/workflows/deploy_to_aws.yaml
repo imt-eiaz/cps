@@ -21,10 +21,7 @@ jobs:
       - name: Install dependencies
         run: npm run install-all
 
-      # Optional build step
-      # - name: Build client
-      #   run: npm run build
-
+      # ✅ STEP 1: Deploy files FIRST
       - name: Deploy to AWS
         uses: easingthemes/ssh-deploy@v5.0.3
         env:
@@ -41,12 +38,21 @@ jobs:
             dist
             build
 
-      # - name: Restart server
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   with:
-      #     host: ec2-52-71-253-131.compute-1.amazonaws.com
-      #     username: ubuntu
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     script: |
-      #       cd /var/www/cps/backend
-      #       npm run restart
+      # ✅ STEP 2: THEN build & restart
+      - name: Build & Restart on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ec2-52-71-253-131.compute-1.amazonaws.com
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/cps/frontend
+
+            echo "Installing dependencies"
+            npm install
+
+            echo "Building Next.js app"
+            npm run build
+
+            echo "Restarting frontend"
+            pm2 restart frontend || pm2 start npm --name "frontend" -- start
