@@ -26,10 +26,10 @@ jobs:
         uses: easingthemes/ssh-deploy@v5.0.3
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SOURCE: "."
+          SOURCE: "frontend/"
           REMOTE_HOST: ec2-52-71-253-131.compute-1.amazonaws.com
           REMOTE_USER: ubuntu
-          TARGET: "/var/www/cps/"
+          TARGET: "/var/www/cps/frontend/"
           EXCLUDE: |
             node_modules
             .next
@@ -49,7 +49,7 @@ jobs:
             cd /var/www/cps/frontend
 
             echo "Installing dependencies"
-            npm install
+            npm ci
 
             echo "Building Next.js app"
             npm run build
