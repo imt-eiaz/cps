@@ -84,8 +84,8 @@ export const bulkMarkAttendance = asyncHandler(
     }
 
     const validStatuses = ["present", "absent", "late", "leave"];
-    const results = [];
-    const errors = [];
+    const results: { studentId: string; status: string }[] = [];
+    const errors: { studentId: string; error: string }[] = [];
 
     for (const record of attendanceRecords) {
       try {

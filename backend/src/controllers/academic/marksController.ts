@@ -45,7 +45,7 @@ export const uploadMarksBulk = asyncHandler(
     const client = await query("BEGIN");
 
     try {
-      const createdMarks = [];
+      const createdMarks: Record<string, unknown>[] = [];
 
       for (const mark of marks) {
         const {
@@ -364,7 +364,7 @@ export const getStudentAllResults = asyncHandler(
 
     const examsResult = await query(resultsQuery, [studentId]);
 
-    const results = [];
+    const results: Record<string, unknown>[] = [];
 
     for (const exam of examsResult.rows) {
       // Get marks summary for each exam
@@ -453,7 +453,7 @@ export const getClassResultSheet = asyncHandler(
 
     const studentsResult = await query(studentsQuery, [classId]);
 
-    const students = [];
+    const students: { studentId: any; studentName: string; admissionNumber: any; subjects: any[]; totalObtained: number; totalMax: number; percentage: number; overallGrade: string; overallGPA: number; passed: boolean; rank: number }[] = [];
 
     for (const student of studentsResult.rows) {
       // Get marks for each student
