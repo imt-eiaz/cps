@@ -18,27 +18,21 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install dependencies
-        run: npm run install-all
-
-      # ✅ STEP 1: Deploy files FIRST
+      # 🚀 STEP 1: Deploy FULL repo (not only frontend)
       - name: Deploy to AWS
         uses: easingthemes/ssh-deploy@v5.0.3
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SOURCE: "frontend/"
+          SOURCE: "."
           REMOTE_HOST: ec2-52-71-253-131.compute-1.amazonaws.com
           REMOTE_USER: ubuntu
-          TARGET: "/var/www/cps/frontend/"
+          TARGET: "/var/www/cps/"
           EXCLUDE: |
             node_modules
-            .next
             .git
             .github
-            dist
-            build
 
-      # ✅ STEP 2: THEN build & restart
+      # 🚀 STEP 2: Build everything on EC2
       - name: Build & Restart on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -46,13 +40,19 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/cps/frontend
+            set -e
 
-            echo "Installing dependencies"
-            npm ci
-
-            echo "Building Next.js app"
+            echo "🔧 Backend setup"
+            cd /var/www/cps/backend
+            npm install
             npm run build
+            pm2 restart backend || pm2 start dist/index.js --name backend
 
-            echo "Restarting frontend"
-            pm2 restart frontend || pm2 start npm --name "frontend" -- start
+            echo "🎨 Frontend setup"
+            cd /var/www/cps/frontend
+            npm install
+            npm run build
+            pm2 restart frontend || pm2 start npm --name frontend -- start
+
+            echo "💾 Saving PM2"
+            pm2 save
