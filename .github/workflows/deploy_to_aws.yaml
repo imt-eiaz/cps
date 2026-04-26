@@ -40,25 +40,62 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            set -e
+            set -euo pipefail
+
+            # Ensure PATH has npm global bin (pm2 often lives here)
+            export PATH="$PATH:$(npm bin -g 2>/dev/null || true)"
+
+            echo "Node: $(node -v || true)"
+            echo "NPM:  $(npm -v || true)"
+            echo "PM2:  $(pm2 -v || true)"
 
             # Ensure ubuntu can write to the deployment directory
             sudo chown -R ubuntu:ubuntu /var/www/cps
             sudo find /var/www/cps -type d -exec chmod 755 {} \;
             sudo find /var/www/cps -type f -exec chmod 644 {} \;
 
+            # --- Backend ---
             echo "🔧 Backend setup"
             cd /var/www/cps/backend
-            npm ci || npm install
-            npm run build
-            pm2 restart backend || pm2 start dist/index.js --name backend
 
+            if [ -f package-lock.json ]; then
+              npm ci
+            else
+              npm install
+            fi
+
+            npm run build
+
+            # Prefer ecosystem config if you have one; otherwise start the built entry
+            if pm2 describe backend >/dev/null 2>&1; then
+              pm2 restart backend
+            else
+              # use absolute path so pm2 doesn't depend on cwd
+              pm2 start /var/www/cps/backend/dist/index.js --name backend
+            fi
+
+            # --- Frontend ---
             echo "🎨 Frontend setup"
             cd /var/www/cps/frontend
             rm -rf .next
-            npm ci || npm install
+
+            if [ -f package-lock.json ]; then
+              npm ci
+            else
+              npm install
+            fi
+
             npm run build
-            pm2 restart frontend || pm2 start npm --name frontend -- start
+
+            if pm2 describe frontend >/dev/null 2>&1; then
+              pm2 restart frontend
+            else
+              # run npm start under pm2 in a stable way
+              pm2 start npm --name frontend -- start
+            fi
 
             echo "💾 Saving PM2"
             pm2 save
+
+            echo "✅ PM2 status"
+            pm2 status || true
