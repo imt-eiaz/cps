@@ -109,7 +109,7 @@ export default function DashboardLayout({
         <header className="bg-white shadow">
           <div className="px-6 py-4 flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-800">
-              School Management System - Candle Public School
+              Welcome Candle Public School
             </h1>
             <div className="flex items-center gap-4">
               <p className="text-gray-600 text-sm">Welcome back!</p>
