@@ -50,7 +50,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            School Management System
+            School Management Systems
           </h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
@@ -116,7 +116,7 @@ export default function LoginPage() {
           </div>
         </form>
 
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+        {/* <div className="mt-6 p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-gray-700 font-semibold mb-2">
             Demo credentials:
           </p>
@@ -134,7 +134,7 @@ export default function LoginPage() {
               password123
             </p>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
