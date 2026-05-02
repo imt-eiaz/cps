@@ -63,7 +63,6 @@ jobs:
 
           # Frontend (production build only)
           cp -r frontend/.next deploy/frontend/
-          cp -r frontend/public deploy/frontend/
           cp frontend/package.json deploy/frontend/
 
       # -----------------------
