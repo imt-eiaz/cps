@@ -24,31 +24,49 @@ jobs:
           node-version: "20"
 
       # -----------------------
-      # 3. Install ROOT deps (optional if monorepo)
+      # 3. Install backend deps
       # -----------------------
-      - name: Install root dependencies
-        run: npm install
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
 
       # -----------------------
-      # 4. Build BACKEND (safe)
+      # 4. Build backend
       # -----------------------
       - name: Build backend
         run: |
           cd backend
-          npm install
           npm run build
 
       # -----------------------
-      # 5. Build FRONTEND (IMPORTANT FIX)
+      # 5. Install + build frontend
       # -----------------------
-      - name: Build frontend
+      - name: Install & build frontend
         run: |
           cd frontend
-          npm install --legacy-peer-deps
-          NODE_OPTIONS=--max_old_space_size=512 npm run build
+          npm ci --legacy-peer-deps
+          NODE_OPTIONS=--max_old_space_size=1024 npm run build
 
       # -----------------------
-      # 6. Deploy ONLY production files
+      # 6. Prepare deployment package (IMPORTANT)
+      # -----------------------
+      - name: Prepare deploy folder
+        run: |
+          rm -rf deploy
+          mkdir -p deploy
+
+          # Backend (ONLY built output)
+          cp -r backend/dist deploy/backend/
+          cp backend/package.json deploy/backend/
+
+          # Frontend (ONLY production build)
+          cp -r frontend/.next deploy/frontend/.next
+          cp -r frontend/public deploy/frontend/public
+          cp frontend/package.json deploy/frontend/
+
+      # -----------------------
+      # 7. Deploy to EC2 (CLEAN ONLY)
       # -----------------------
       - name: Deploy to EC2
         uses: easingthemes/ssh-deploy@v5.0.3
@@ -58,7 +76,12 @@ jobs:
           REMOTE_USER: ubuntu
           TARGET: "/var/www/cps/"
 
-          # IMPORTANT: only send production output
-          SOURCE: "."
+          # ONLY send production bundle
+          SOURCE: "deploy/"
 
-          EXCLUDE: "/node_modules/, /.git/, /.github/, /frontend/node_modules/, /backend/node_modules/, /frontend/.next/cache/"
+          EXCLUDE: |
+            **/node_modules/**
+            **/.git/**
+            **/.github/**
+            **/.next/cache/**
+            **/*.log
