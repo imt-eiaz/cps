@@ -75,13 +75,11 @@ jobs:
           REMOTE_HOST: ec2-52-71-253-131.compute-1.amazonaws.com
           REMOTE_USER: ubuntu
           TARGET: "/var/www/cps/"
-
-          # ONLY send production bundle
           SOURCE: "deploy/"
 
           EXCLUDE: |
-            **/node_modules/**
-            **/.git/**
-            **/.github/**
-            **/.next/cache/**
-            **/*.log
+            node_modules
+            .git
+            .github
+             .next/cache
+             *.log
