@@ -54,15 +54,16 @@ jobs:
       - name: Prepare deploy folder
         run: |
           rm -rf deploy
-          mkdir -p deploy
+          mkdir -p deploy/backend
+          mkdir -p deploy/frontend
 
-          # Backend (ONLY built output)
+          # Backend (only build output)
           cp -r backend/dist deploy/backend/
           cp backend/package.json deploy/backend/
 
-          # Frontend (ONLY production build)
-          cp -r frontend/.next deploy/frontend/.next
-          cp -r frontend/public deploy/frontend/public
+          # Frontend (production build only)
+          cp -r frontend/.next deploy/frontend/
+          cp -r frontend/public deploy/frontend/
           cp frontend/package.json deploy/frontend/
 
       # -----------------------
