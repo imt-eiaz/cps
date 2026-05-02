@@ -42,10 +42,11 @@ jobs:
       # -----------------------
       # 5. Install + build frontend
       # -----------------------
-      - name: Install & build frontend
+      - name: Install + Build frontend
         run: |
           cd frontend
-          npm ci --legacy-peer-deps
+          npm install --legacy-peer-deps
+          npm run build
           NODE_OPTIONS=--max_old_space_size=1024 npm run build
 
       # -----------------------
@@ -57,11 +58,11 @@ jobs:
           mkdir -p deploy/backend
           mkdir -p deploy/frontend
 
-          # Backend (only build output)
+          # Backend
           cp -r backend/dist deploy/backend/
           cp backend/package.json deploy/backend/
 
-          # Frontend (production build only)
+          # Frontend (ONLY production build)
           cp -r frontend/.next deploy/frontend/
           cp frontend/package.json deploy/frontend/
 
@@ -81,5 +82,5 @@ jobs:
             node_modules
             .git
             .github
-             .next/cache
-             *.log
+            .next/cache
+            *.log
