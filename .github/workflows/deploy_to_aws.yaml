@@ -61,12 +61,4 @@ jobs:
           # IMPORTANT: only send production output
           SOURCE: "."
 
-          EXCLUDE: |
-            node_modules
-            .git
-            .github
-            frontend/node_modules
-            backend/node_modules
-            frontend/.next/cache
-            backend/src
-            frontend/src
+          EXCLUDE: "/node_modules/, /.git/, /.github/, /frontend/node_modules/, /backend/node_modules/, /frontend/.next/cache/"
